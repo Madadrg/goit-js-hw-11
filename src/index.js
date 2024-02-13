@@ -1,4 +1,7 @@
-// index.js
+// Described in the documentation
+import SimpleLightbox from 'simplelightbox';
+// Additional style import
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 // Constants
 const API_KEY = '42335893-81a0738270e344fb8d80a811a';
@@ -54,6 +57,9 @@ function fetchImages(searchQuery, page) {
         loadMoreButton.style.display = 'none';
         displayEndOfResults();
       }
+
+      // After displaying images, call refresh for SimpleLightbox
+      refreshSimpleLightbox();
     })
     .catch(error => {
       displayError();
@@ -86,6 +92,10 @@ function createPhotoCard(image) {
   const photoCard = document.createElement('div');
   photoCard.className = 'photo-card';
 
+  const imgLink = document.createElement('a');
+  imgLink.href = image.largeImageURL;
+  imgLink.setAttribute('data-lightbox', 'gallery');
+
   const img = document.createElement('img');
   img.src = image.webformatURL;
   img.alt = image.tags;
@@ -103,7 +113,8 @@ function createPhotoCard(image) {
     info.appendChild(p);
   });
 
-  photoCard.appendChild(img);
+  photoCard.appendChild(imgLink); // Append the link instead of the image directly
+  imgLink.appendChild(img); // Append the image to the link
   photoCard.appendChild(info);
 
   return photoCard;
@@ -113,4 +124,11 @@ function displayError() {
   const notification = document.getElementById('notification');
   notification.innerText =
     'Sorry, there are no images matching your search query. Please try again.';
+}
+
+function refreshSimpleLightbox() {
+  // Check if SimpleLightbox is defined and has the refresh method
+  if (typeof SimpleLightbox !== 'undefined' && SimpleLightbox.refresh) {
+    SimpleLightbox.refresh();
+  }
 }
