@@ -1,7 +1,7 @@
-// Described in the documentation
 import SimpleLightbox from 'simplelightbox';
-// Additional style import
 import 'simplelightbox/dist/simple-lightbox.min.css';
+
+const lightbox = new SimpleLightbox();
 
 // Constants
 const API_KEY = '42335893-81a0738270e344fb8d80a811a';
@@ -92,10 +92,12 @@ function createPhotoCard(image) {
   const photoCard = document.createElement('div');
   photoCard.className = 'photo-card';
 
+  // Create a link and set its attributes
   const imgLink = document.createElement('a');
   imgLink.href = image.largeImageURL;
   imgLink.setAttribute('data-lightbox', 'gallery');
 
+  // Create the image element and set its attributes
   const img = document.createElement('img');
   img.src = image.webformatURL;
   img.alt = image.tags;
@@ -113,9 +115,12 @@ function createPhotoCard(image) {
     info.appendChild(p);
   });
 
-  photoCard.appendChild(imgLink); // Append the link instead of the image directly
-  imgLink.appendChild(img); // Append the image to the link
-  photoCard.appendChild(info);
+  // Append the image and info to the link
+  imgLink.appendChild(img);
+  imgLink.appendChild(info);
+
+  // Append the link to the photo card
+  photoCard.appendChild(imgLink);
 
   return photoCard;
 }
