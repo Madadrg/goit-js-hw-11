@@ -6,6 +6,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 // Constants
 const API_KEY = '42335893-81a0738270e344fb8d80a811a';
 const gallery = document.getElementById('gallery');
+const loadMoreButton = document.querySelector('.load-more');
 let currentPage = 1; // Initialize the current page
 
 document
@@ -22,15 +23,23 @@ document
     fetchImages(searchQuery, currentPage);
   });
 
-loadMoreButton.addEventListener('click', function () {
-  const searchQuery = document.getElementsByName('searchQuery')[0].value;
+const observer = new IntersectionObserver(
+  entries => {
+    if (entries[0].isIntersecting) {
+      const searchQuery = document.getElementsByName('searchQuery')[0].value;
 
-  // Increment the current page for the next set of images
-  currentPage++;
+      // Increment the current page for the next set of images
+      currentPage++;
 
-  // Make API request
-  fetchImages(searchQuery, currentPage);
-});
+      // Make API request
+      fetchImages(searchQuery, currentPage);
+    }
+  },
+  { threshold: 0.5 } // Adjust the threshold as needed
+);
+
+// Start observing the bottom of the page
+observer.observe(loadMoreButton);
 
 function fetchImages(searchQuery, page) {
   const perPage = 40;
@@ -50,6 +59,19 @@ function fetchImages(searchQuery, page) {
       // Display images
       displayImages(data.hits);
 
+      // After displaying images, call refresh for SimpleLightbox
+      refreshSimpleLightbox();
+
+      // Smooth scroll to the next set of images
+      const { height: cardHeight } = document
+        .querySelector('.gallery')
+        .firstElementChild.getBoundingClientRect();
+
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
+
       // Check if there are more images to load
       if (data.totalHits <= page * perPage) {
         // Hide the "Load more" button and display end of results notification
@@ -59,24 +81,10 @@ function fetchImages(searchQuery, page) {
 
       // After displaying images, call refresh for SimpleLightbox
       refreshSimpleLightbox();
-
-      // Implement smooth scroll after displaying images
-      smoothScroll();
     })
     .catch(error => {
       displayError();
     });
-}
-
-function smoothScroll() {
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
 }
 
 function clearGallery() {
@@ -145,16 +153,3 @@ function refreshSimpleLightbox() {
     SimpleLightbox.refresh();
   }
 }
-
-window.addEventListener('scroll', function () {
-  const scrollPosition = window.scrollY;
-  const windowHeight = window.innerHeight;
-  const documentHeight = document.documentElement.scrollHeight;
-
-  if (scrollPosition + windowHeight >= documentHeight - 200) {
-    // Adjust the threshold (200 in this case) based on your preference
-    const searchQuery = document.getElementsByName('searchQuery')[0].value;
-    currentPage++;
-    fetchImages(searchQuery, currentPage);
-  }
-});
