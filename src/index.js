@@ -9,6 +9,9 @@ const gallery = document.getElementById('gallery');
 const loadMoreButton = document.querySelector('.load-more');
 let currentPage = 1; // Initialize the current page
 
+// Hide the gallery initially
+gallery.style.display = 'none';
+
 document
   .getElementById('search-form')
   .addEventListener('submit', function (event) {
@@ -54,6 +57,9 @@ function fetchImages(searchQuery, page) {
         clearGallery();
         // Show the "Load more" button after the first request
         loadMoreButton.style.display = 'block';
+
+        // Show the gallery after the first search
+        gallery.style.display = 'block';
       }
 
       // Display images
